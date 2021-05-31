@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+  font-family: 'Roboto Condensed', sans-serif;
+  font-size: 1em;
+  margin: 0;
+  padding: 0;
+  background-color: #222;
+}
+
+.page_wrap {
+  width: 1107px;
+  height: 368px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -184px;
+  margin-left: -553.5px;
+}
+
+#options_wrap {
+  width: 193px;
+  padding: 30px;
+  float: left;
+}
+
+ul.options {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background-color: #ddd;
+  float: left;
+  border: 1px solid #555;
+}
+
+ul.options li {
+  cursor: pointer;
+  padding: 15px;
+  float: left;
+  background-color: #333;
+  color: #fff;
+  border-right: 1px solid #555;
+}
+
+ul.options li:last-child {
+  border: none;
+}
+
+ul.options li:hover {
+  background-color: #444;
+}
+
+ul.options li.selected {
+  background-color: #555;
+}
+
+input[type='number'], #commandInput {
+  background-color: #333;
+  border: none;
+  outline: none;
+  padding: 10px;
+  display: block;
+  float: left;
+  width: 170.59px;
+  border: 1px solid #555;
+  font: inherit;
+  color: #fff;
+}
+
+#commandInput {
+  width: 228px;
+  background-color: #111;
+  border: 1px solid #333;
+}
+
+.label {
+  text-transform: uppercase;
+  color: #999;
+  font-weight: bold;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  width: 100%;
+  float: left;
+}
+
+.label:first-child {
+  margin-top: 0;
+}
+
+#balance {
+  font-size: 1.6em;
+  font-weight: bold;
+  color: #fff;
+}
+
+button {
+  display: block;
+  float: left;
+  width: 100%;
+  padding: 15px 0;
+  font-size: 1.2em;
+  font-family: inherit;
+  text-transform: uppercase;
+  font-weight: bold;
+  background-color: #1f7ce0;
+  color: #fff;
+  border: none;
+  outline: none;
+  margin-top: 15px;
+  border-bottom: 5px solid #1559a3;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #2b8bf2;
+}
+
+button:active {
+  position: relative;
+  top: 3px;
+  border-bottom: 2px solid #1559a3;
+}
+
+button.disabled, #cashout_button.disabled,  #cashout_button.disabled:hover {
+  background-color: #aaa;
+  color: #555;
+  border-bottom: 5px solid #777;
+  cursor: not-allowed;
+}
+
+button.disabled:active {
+  top: 0;
+  border-bottom: 5px solid #777;
+}
+
+.game_wrap {
+  float: left;
+  width: 304px;
+  padding: 30px;
+}
+
+#tiles {
+  float: left;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid #555;
+}
+
+#tiles li {
+  width: 60px;
+  height: 60px;
+  float: left;
+  display: block;
+  background-color: #333;
+  border-right: 1px solid #555;
+  border-bottom: 1px solid #555;
+  cursor: pointer;
+}
+
+#tiles li:hover {
+  background-color: #3f3f3f;
+}
+
+#tiles li:nth-child(5n) {
+  border-right: none;
+}
+
+#tiles li:nth-last-child(-n+5) {
+  border-bottom: none;
+}
+
+#tiles li.good {
+  background-color: #26b53d;
+}
+
+#tiles li.bad {
+  background-color: #a33030;
+}
+
+.console_wrap {
+  float: left;
+  width: 250px;
+  padding: 30px 10px;
+}
+
+.console {
+  width: 218px;
+  background-color: #171717;
+  height: 211px;
+  padding: 15px;
+  border: 1px solid #333;
+  border-bottom: 0;
+  overflow-y: scroll;
+}
+
+.message {
+  display: block;
+  width: 100%;
+}
+
+.message.success {
+  color: #1e9932;
+}
+
+.message.danger {
+  color: #991e1e;
+}
+
+.message.info {
+  color: #4286f4;
+}
+
+.cashout_wrap {
+  width: 200px;
+  float: left;
+  padding: 30px 10px;
+}
+
+#cashout_button {
+  margin: 0;
+  background-color: #30c42b;
+  border-bottom: 5px solid #23961f;
+}
+
+#cashout_button:hover {
+  background-color: #3adb34;
+}
+
+#cashout_button:active {
+  border-bottom: 2px solid #23961f;
+}
+
+#winnings_label {
+  font-size: 1.5em;
+  text-align: center;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>$(document).ready(function(){
+  
+  // Variables
+  balance = 5;
+  play_button_enabled = true;
+  cashout_button_enabled = false;
+  num_of_bombs = 1;
+  game_in_progress = false;
+  bomb_locations = [];
+  selected_tiles = [];
+  bet = 0;
+  winnings = 0;
+  
+  // Options List
+  $('.options li').click(function(){
+    $('.options li').each(function(){
+      $(this).removeClass('selected');
+    });
+    $(this).addClass('selected');
+    num_of_bombs = parseInt($(this).attr("id"));
+  });
+  
+  // When play button is clicked
+  $('#play_button').click(function(){
+    if (play_button_enabled) {
+      // Validate balance
+      bet = parseFloat($('#bet_field').val());
+      if (bet <= balance && bet > 0) {
+        newGame();
+      }else {
+        // Not enough money
+        consoleLog('danger', 'You do not have enough money or have not entered a bet above 0.');
+      }
+    }
+  });
+  
+  // Game function
+  function newGame() {
+    if (!game_in_progress) {
+      game_in_progress = true;
+      // Deduct bet from balance
+      balance = balance - bet;
+      winnings = bet;
+      updateWinnings();
+      updateBalance();
+      // Disable play button
+      togglePlayButton();
+      toggleCashoutButton();
+      setBombLocations(num_of_bombs,1,25);
+      consoleLog('info', 'Game started with '+num_of_bombs+' bombs.');
+    }
+  }
+  
+  // When command is entered
+  $('#commandInput').keypress(function (e) {
+    if (e.which == 13) {
+      var command = $('#commandInput').val();
+      switch (command) {
+        case '/viewBombs':
+          viewBombs();
+          break;
+        case '/viewNonBombs':
+          viewNonBombs();
+          break;
+        case '/freeMoney':
+          freeMoney();
+          break;
+        case '/clear':
+          clearConsole();
+          break;
+        default:
+          consoleLog('danger', 'Command not found.');
+      }
+      $('#commandInput').val("");
+      return false;
+    }
+  });
+  
+  // When tile is clicked
+  $('#tiles li').click(function(){
+    if (game_in_progress) {
+      var index = $(this).index() + 1;
+      if (selected_tiles.indexOf(index) == -1) {
+        selected_tiles.push(index);
+        if (bomb_locations.indexOf(index) == -1) {
+          // Did NOT select a bomb
+          $(this).addClass('good');
+          var odds = 1 - (num_of_bombs / (26 - selected_tiles.length));
+          var multiplier = 1 / odds;
+          var new_winnings = +(((bet * multiplier) - bet).toFixed(2));
+          consoleLog('success', '+'+new_winnings);
+          winnings = +((winnings + new_winnings).toFixed(2));
+          updateWinnings();
+        }else {
+          // Did select a bomb
+          $(this).addClass('bad');
+          consoleLog('danger', '-'+winnings);
+          toggleCashoutButton();
+          game_in_progress = false;
+          setTimeout(function(){
+            togglePlayButton();
+            winnings = 0;
+            updateWinnings();
+            bomb_locations = [];
+            selected_tiles = [];
+            $('#tiles li').each(function(){
+              $(this).removeClass();
+            });
+            clearConsole();
+          }, 3000);
+        }
+      }
+    }
+  });
+  
+  $('#cashout_button').click(function(){
+    if (cashout_button_enabled) {
+      // End game
+      toggleCashoutButton();
+      togglePlayButton();
+      balance += +(winnings).toFixed(2);
+      updateBalance();
+      winnings = 0;
+      updateWinnings();
+      game_in_progress = false;
+      bomb_locations = [];
+      selected_tiles = [];
+      $('#tiles li').each(function(){
+        $(this).removeClass();
+      });
+      clearConsole();
+    }
+  });
+  
+  // Helper functions
+  function clearConsole() {
+    $('.console').html("");
+  }
+  
+  function updateBalance() {
+    balance = +(balance).toFixed(2);
+    $('#balance').html(""+balance);
+  }
+  
+  function updateWinnings() {
+  winnings = +(winnings).toFixed(2);  $('#winnings_label').html("+"+winnings);
+  }
+  
+  function togglePlayButton() {
+    $('#play_button').toggleClass('disabled');
+    if (play_button_enabled) {
+      play_button_enabled = false;
+    }else {
+      play_button_enabled = true;
+    }
+  }
+  
+  function toggleCashoutButton() {
+    $('#cashout_button').toggleClass('disabled');
+    if (cashout_button_enabled) {
+      cashout_button_enabled = false;
+    }else {
+      cashout_button_enabled = true;
+    }
+  }
+  
+  function setBombLocations(amount, min, max) {
+    for (i = 0; i < amount; i++) {
+      var num = Math.floor(Math.random() * max) + min;
+      while (bomb_locations.indexOf(num) != -1) {
+        num = Math.floor(Math.random() * max) + min;
+      }
+      bomb_locations.push(num);
+    }
+  }
+  
+  function consoleLog(type, message) {
+    $('.console').append('<span class="message '+type+'">'+message+'</span>');
+  }
+  
+  function viewBombs() {
+    if (game_in_progress) {
+      var str = "Bombs: ";
+      for (var i = 1; i < 26; i++) {
+        if (bomb_locations.indexOf(i) != -1) {
+          str += i+", ";
+        }
+      }
+      consoleLog('info', str);
+    }else {
+      consoleLog('danger', 'Game not in progress.');
+    }
+  }
+  
+  function viewNonBombs() {
+    if (game_in_progress) {
+      var str = "Not Bombs: ";
+      for (var i = 1; i < 26; i++) {
+        if (bomb_locations.indexOf(i) == -1) {
+          str += i+", ";
+        }
+      }
+      consoleLog('info', str);
+    }else {
+      consoleLog('danger', 'Game not in progress.');
+    }
+  }
+  
+  function freeMoney() {
+    if (!game_in_progress) {
+      balance += 5;
+      updateBalance();
+      consoleLog('success', '+5 to your balance.');
+    }else {
+      consoleLog('danger', 'Cannot use this command during a game.')
+    }
+  }
+  
+});
+</script>
+</head>
+<body>
+  <div class='page_wrap'>
+    <div id='options_wrap'>
+      <span class='label'>Balance:</span>
+      <span id='balance'>15</span>
+      <span class='label'>Bombs:</span>
+      <ul class='options'>
+        <li id='1' class='selected'>x1</li>
+        <li id='3'>x3</li>
+        <li id='5'>x5</li>
+        <li id='24'>x24</li>
+      </ul>
+      <span class='label'>Bet Amount:</span>
+      <input type='number' id='bet_field' value='0'>
+      <button id='play_button'>Play</button>
+    </div>
+    <div class='game_wrap'>
+      <ul id='tiles'>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+    </div>
+    <div class='console_wrap'>
+      <span class='label'>Console:</span>
+      <div class='console'></div>
+      <input type='text' id='commandInput' placeholder='Type secret commands ...'>
+    </div>
+    <div class='cashout_wrap'>
+      <span class='label' id='winnings_label'>+0</span>
+      <button id='cashout_button' class='disabled'>Cashout</button>
+    </div>
+  </div>
+</body>
+</html>
