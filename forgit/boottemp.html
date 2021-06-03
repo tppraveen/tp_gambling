@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<style>
+ ul  li .selected {
+  background-color: skyblue;
+}
+.game_wrap {
+  float: left;
+  width: 386px;
+  padding: 30px;
+}
+
+#tiles {
+  float: left;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid #555;
+}
+
+#tiles li {
+  width: 60px;
+  height: 60px;
+  float: left;
+  margin:  2px;
+  display: block;
+  background-color: #333;
+  border-right: 1px solid #555;
+  border-bottom: 1px solid #555;
+  cursor: pointer;
+}
+
+#tiles li:hover {
+  background-color: #3f3f3f;
+}
+
+#tiles li:nth-child(5n) {
+  border-right: none;
+}
+
+#tiles li:nth-last-child(-n+5) {
+  border-bottom: none;
+}
+
+#tiles li.good {
+  background-color: #26b53d;
+}
+
+#tiles li.bad {
+  background-color: #a33030;
+}
+/*console*/
+
+ #commandInput {
+  background-color: #333;
+  border: none;
+  outline: none;
+  padding: 10px;
+  display: block;
+  float: left;
+  height: 14%;
+  width: 170.59px;
+  border: 1px solid #555;
+  font: inherit;
+  color: #fff;
+}
+
+#commandInput {
+  width: 100%;
+  background-color: #111;
+  border: 1px solid #333;
+}
+
+.console_wrap {
+  float: left;
+  width: 100%;height: 100%;
+  padding: 30px 10px;
+}
+
+.console {
+  width: 100%;
+  background-color: #171717;
+  height: 280px;
+  padding: 15px;
+  border: 1px solid #333;
+  border-bottom: 0;
+  overflow-y: scroll;
+}
+
+.message {
+  display: block;
+  width: 100%;
+}
+
+.message.success {
+  color: #1e9932;
+}
+
+.message.danger {
+  color: #991e1e;
+}
+
+.message.info {
+  color: #4286f4;
+}
+</style>
+<script src="myscripts.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<body>
+
+<div class="container"> <br>
+  <div  class=" border p-4 ">
+   
+      <span class='label text-danger'>Balance:</span>
+
+      <span id='balance' style="text-align:center;color:green">500</span>
+      
+      
+      <div class='navbar navbar-expand-sm bg-light'>
+      <ul class=" options nav nav-pills nav-justified  options" id="bombid">
+    <li class="nav-item ">
+      <a class="nav-link selected" id='5'  href="#">x5</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link"  id='8' href="#">x8</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id='11' href="#">x11</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link " id='24' href="#">x24</a>
+    </li>
+  </ul>
+  </div> 
+  
+    
+    <div class="form-group">
+      <label for="uname">Bet Amount:</label>
+      <input  class="form-control"  type='number' id='bet_field' value='1' required> 
+    </div> 
+    
+    <button id='play_button' class="btn btn-primary">Play</button>
+  </div>
+</div>
+
+  
+
+ 
+<div class="container"> 
+ 
+
+
+  <div class="row">
+
+    <div class="col-sm-4">
+      <div class='game_wrap'>
+        <span class='label'>How to Play:</span>
+      <ul id='tiles'>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul> 
+    </div>  
+    </div>
+
+    <div class="col-sm-4">
+
+ 
+
+      <div class='console_wrap '>
+        <span class='label'>Console:</span>
+        <div class='console '></div>
+        <input type='text' id='commandInput' placeholder='Type secret commands ...'>
+      </div>  
+    </div> 
+
+
+
+
+    <div class="col-sm-4">
+      <div class=" text-center ">
+       <div class='form-group border p-4'>
+        <span class='label' id='winnings_label'>+0</span><br>
+        <button id='cashout_button' class='disabled' class="btn btn-primary">Cashout</button>
+      </div>
+      </div>
+</div>
+
+  </div>
+</div>
+
+
+ 
+
+
+
+
+
+</body>
+</html>
